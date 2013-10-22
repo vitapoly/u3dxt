@@ -1,0 +1,239 @@
+using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using U3DXT.Core;
+using U3DXT.iOS.Native.UIKit;
+using U3DXT.iOS.Native.Foundation;
+using UnityEngine;
+using U3DXT.iOS.Native.Social;
+using U3DXT.iOS.Native.MessageUI;
+using U3DXT.iOS.Social.Helpers;
+using U3DXT.Utils;
+
+namespace U3DXT.iOS.Social {
+	/// <summary>
+	/// Main class for iOS Social plugin. High-level API to share.</summary>
+	/// <remarks>
+	/// In iOS 6.0 and later, it is recommended to use the simple Share() method to
+	/// show the native interface to share messages, images, and URLs
+	/// via Facebook, Twitter, Sina Weibo, email, SMS, print, copy, save to camera roll, or
+	/// assign to contact.
+	/// <p></p>
+	/// You can also use the Post() method to post to a specific social networking service.
+	/// Or use Mail() and SMS() methods to send email and SMS.
+	/// </remarks>
+	public class SocialXT {
+
+#region events
+		private static EventHandler<ShareCompletedEventArgs> _shareCompletedHandlers;
+		/// <summary>
+		/// Occurs when a share operation has completed.
+		/// </summary>
+		public static event EventHandler<ShareCompletedEventArgs> ShareCompleted {
+			add { _shareCompletedHandlers += value; }
+			remove { _shareCompletedHandlers -= value; }
+		}
+
+		private static EventHandler<PostCompletedEventArgs> _postCompletedHandlers;
+		/// <summary>
+		/// Occurs when a post operation has completed.
+		/// </summary>
+		public static event EventHandler<PostCompletedEventArgs> PostCompleted {
+			add { _postCompletedHandlers += value; }
+			remove { _postCompletedHandlers -= value; }
+		}
+
+		private static EventHandler<MailCompletedEventArgs> _mailCompletedHandlers;
+		/// <summary>
+		/// Occurs when a mail operation has completed.
+		/// </summary>
+		public static event EventHandler<MailCompletedEventArgs> MailCompleted {
+			add { _mailCompletedHandlers += value; }
+			remove { _mailCompletedHandlers -= value; }
+		}
+
+		private static EventHandler<SMSCompletedEventArgs> _smsCompletedHandlers;
+		/// <summary>
+		/// Occurs when a SMS operation has completed.
+		/// </summary>
+		public static event EventHandler<SMSCompletedEventArgs> SMSCompleted {
+			add { _smsCompletedHandlers += value; }
+			remove { _smsCompletedHandlers -= value; }
+		}
+#endregion
+
+#region private vars
+
+		private static UIPopoverController _popover;
+
+#endregion
+
+#region methods
+		/// <summary>
+		/// Shows the native UIActivityViewController to share message, images, and URLs
+		/// via Facebook, Twitter, Weibo, email, SMS, print, copy, save to camera roll, or
+		/// assign to contact.
+		/// Raises ShareCompleted event when completed.
+		/// </summary>
+		/// <remarks>
+		/// This is available in iOS 6.0 and later.</remarks>
+		/// 
+		/// <param name="items"> An array of items to share. Each item can be a string or Texture2D.
+		/// 			Strings starting with http:// or https:// will be automatically converted to URLs.</param>
+		/// <param name="excludedActivityTypes"> An array of strings representing the activity types to exclude from sharing.
+		/// 			See <see cref="UIActivity">Constants in UIActivity</see>.</param>
+		public static void Share(object[] items, string[] excludedActivityTypes = null) {
+			var nativeItems = new object[items.Length];
+			for (int i=0; i<items.Length; i++) {
+				var item = items[i];
+				if (item is string) {
+					string str = item as string;
+					if (str.StartsWith("http://") || str.StartsWith("https://"))
+						nativeItems[i] = new NSURL(str);
+					else
+						nativeItems[i] = str;
+				}
+				else if (item is Texture2D)
+					nativeItems[i] = UIImage.FromTexture2D(item as Texture2D);
+				else if (item is NSURL)
+					nativeItems[i] = item;
+				else
+					throw new U3DXTException("Unexpected item type: " + item.GetType());
+			}
+			
+			var vc = new UIActivityViewController(nativeItems, null);
+			vc.completionHandler = _activityViewCompleted;
+			if (excludedActivityTypes != null)
+				vc.excludedActivityTypes = excludedActivityTypes;
+			
+			var rootVc = UIApplication.SharedApplication().keyWindow.rootViewController;
+			if (CoreXT.IsiPad) {
+				if (_popover == null)
+					_popover = new UIPopoverController(vc);
+				else
+					_popover.contentViewController = vc;
+				
+				var rect = rootVc.view.bounds;
+				rect.x = rect.width / 2;
+				rect.y = rect.height;
+				rect.width = 1;
+				rect.height = 1;
+				_popover.PresentPopover(
+					rect,
+					rootVc.view,
+					UIPopoverArrowDirection.Down,
+					true);
+			} else {
+				rootVc.PresentViewController(vc, true, null);
+			}
+		}
+		
+		private static void _activityViewCompleted(string activityType, bool completed) {
+			if (_shareCompletedHandlers != null)
+				_shareCompletedHandlers(null, new ShareCompletedEventArgs(activityType, completed));
+		}
+		
+		/// <summary>
+		/// Shows the native SLComposeViewController to post a message with image and/or URL on Facebook, Twitter, or Weibo.
+		/// Raises PostCompleted event when completed.</summary>
+		/// <remarks>
+		/// This is available in iOS 6.0 and later.
+		/// </remarks>
+		/// <param name="serviceType"> The service to post to. See <see cref="SLRequest">Constants in SLRequest</see>.</param>
+		/// <param name="message"> The message to post or can be null.</param>
+		/// <param name="image"> The image to post or can be null.</param>
+		/// <param name="url"> The URL to post or can be null.</param>
+		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
+		/// <returns> True if it is able to show the native view controller; false if the service type is not available.</returns>
+		public static bool Post(string serviceType, string message, Texture2D image, String url, bool checkServiceAvailable = true) {
+			if (checkServiceAvailable && !SLComposeViewController.IsAvailable(serviceType))
+				return false;
+			
+			var vc = SLComposeViewController.ComposeViewController(serviceType);
+			vc.completionHandler = _composeViewCompleted;
+			
+			if (message != null)
+				vc.SetInitialText(message);
+			
+			if (image != null)
+				vc.AddImage(UIImage.FromTexture2D(image));
+			
+			if (url != null)
+				vc.AddURL(new NSURL(url));
+			
+			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			return true;
+		}
+		
+		private static void _composeViewCompleted(SLComposeViewControllerResult result) {
+			if (UIApplication.SharedApplication().keyWindow.rootViewController != null)
+				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			
+			if (_postCompletedHandlers != null)
+				_postCompletedHandlers(null, new PostCompletedEventArgs(result == SLComposeViewControllerResult.Done));
+		}
+		
+		/// <summary>
+		/// Shows the native MFMailComposeViewController to send an email.
+		/// Raises MailCompleted event when completed.</summary>
+		/// 
+		/// <param name="recipients"> An array of strings representing the email addresses of the recipients.</param>
+		/// <param name="subject"> The subject of the email.</param>
+		/// <param name="body"> The body of the email.</param>
+		/// <param name="bodyIsHTML"> True if the body is HTML; false otherwise.</param>
+		/// <param name="image"> The image to attach to the email.</param>
+		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
+		/// <returns> True if it is able to show the native view controller; false if it cannot send email.</returns>
+		public static bool Mail(string[] recipients, string subject, string body, bool bodyIsHTML, Texture2D image = null, bool checkServiceAvailable = true) {
+			if (checkServiceAvailable && !MFMailComposeViewController.CanSendMail())
+				return false;
+			
+			var vc = new MFMailComposeViewController();
+			vc.mailComposeDelegate = MailComposeViewControllerDelegate.instance;
+			vc.SetToRecipients(recipients);
+			vc.SetSubject(subject);
+			vc.SetMessageBody(body, bodyIsHTML);
+			
+			if (image != null) {
+				var nsdata = NSData.FromByteArray(image.EncodeToPNG());
+				vc.AddAttachmentData(nsdata, "image/png", "image.png");
+			}
+			
+			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			return true;
+		}
+		
+		internal static void OnMailCompleted(MFMailComposeResult result, NSError error) {
+			if (_mailCompletedHandlers != null)
+				_mailCompletedHandlers(null, new MailCompletedEventArgs(result, error));
+		}
+		
+		/// <summary>
+		/// Shows the native MFMessageComposeViewController to send a SMS.
+		/// Raises SMSCompleted event when completed.</summary>
+		/// 
+		/// <param name="recipients"> An array of strings representing the phone numbers of the recipients.</param>
+		/// <param name="body"> The body of the SMS.</param>
+		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
+		/// <returns> True if it is able to show the native view controller; false if it cannot send SMS.</returns>
+		public static bool SMS(string[] recipients, string body, bool checkServiceAvailable = true) {
+			if (checkServiceAvailable && !MFMessageComposeViewController.CanSendText())
+				return false;
+			
+			var vc = new MFMessageComposeViewController();
+			vc.messageComposeDelegate = MessageComposeViewControllerDelegate.instance;
+			vc.recipients = recipients;
+			vc.body = body;
+			
+			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			return true;
+		}
+		
+		internal static void OnSMSCompleted(MessageComposeResult result) {
+			if (_smsCompletedHandlers != null)
+				_smsCompletedHandlers(null, new SMSCompletedEventArgs(result));
+		}
+
+#endregion
+	}
+}
