@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.GameKit;
 using U3DXT.iOS.Native.UIKit;
@@ -26,3 +28,4 @@ namespace U3DXT.iOS.GameKit.Helpers {
 	}
 }
 
+#endif

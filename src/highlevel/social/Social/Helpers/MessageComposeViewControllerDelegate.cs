@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.MessageUI;
 using U3DXT.iOS.Native.Foundation;
@@ -27,3 +29,5 @@ namespace U3DXT.iOS.Social.Helpers
 		}
 	}
 }
+
+#endif

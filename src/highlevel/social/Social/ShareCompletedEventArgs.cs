@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT;
 using U3DXT.iOS.Native.UIKit;
@@ -51,3 +53,4 @@ namespace U3DXT.iOS.Social {
 	}
 }
 
+#endif

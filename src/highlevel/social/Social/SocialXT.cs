@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -9,6 +11,7 @@ using U3DXT.iOS.Native.Social;
 using U3DXT.iOS.Native.MessageUI;
 using U3DXT.iOS.Social.Helpers;
 using U3DXT.Utils;
+using System.Collections.Generic;
 
 namespace U3DXT.iOS.Social {
 	/// <summary>
@@ -66,6 +69,8 @@ namespace U3DXT.iOS.Social {
 
 		private static UIPopoverController _popover;
 
+		private static UIDocumentInteractionController _documentIC;
+
 #endregion
 
 #region methods
@@ -78,7 +83,7 @@ namespace U3DXT.iOS.Social {
 		/// <remarks>
 		/// This is available in iOS 6.0 and later.</remarks>
 		/// 
-		/// <param name="items"> An array of items to share. Each item can be a string or Texture2D.
+		/// <param name="items"> An array of items to share. Each item can be a string, NSURL, Texture2D, or UIImage.
 		/// 			Strings starting with http:// or https:// will be automatically converted to URLs.</param>
 		/// <param name="excludedActivityTypes"> An array of strings representing the activity types to exclude from sharing.
 		/// 			See <see cref="UIActivity">Constants in UIActivity</see>.</param>
@@ -95,6 +100,8 @@ namespace U3DXT.iOS.Social {
 				}
 				else if (item is Texture2D)
 					nativeItems[i] = UIImage.FromTexture2D(item as Texture2D);
+				else if (item is UIImage)
+					nativeItems[i] = item;
 				else if (item is NSURL)
 					nativeItems[i] = item;
 				else
@@ -102,6 +109,9 @@ namespace U3DXT.iOS.Social {
 			}
 			
 			var vc = new UIActivityViewController(nativeItems, null);
+			if (vc.IsNil)
+				return;
+
 			vc.completionHandler = _activityViewCompleted;
 			if (excludedActivityTypes != null)
 				vc.excludedActivityTypes = excludedActivityTypes;
@@ -145,22 +155,44 @@ namespace U3DXT.iOS.Social {
 		/// <param name="url"> The URL to post or can be null.</param>
 		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
 		/// <returns> True if it is able to show the native view controller; false if the service type is not available.</returns>
-		public static bool Post(string serviceType, string message, Texture2D image, String url, bool checkServiceAvailable = true) {
+		public static bool Post(string serviceType, string message, Texture2D image, String url, bool checkServiceAvailable = false) {
+			UIImage uiimage = null;
+			if (image != null)
+				uiimage = UIImage.FromTexture2D(image);
+			return Post(serviceType, message, uiimage, url, checkServiceAvailable);
+		}
+
+		/// <summary>
+		/// Shows the native SLComposeViewController to post a message with image and/or URL on Facebook, Twitter, or Weibo.
+		/// Raises PostCompleted event when completed.</summary>
+		/// <remarks>
+		/// This is available in iOS 6.0 and later.
+		/// </remarks>
+		/// <param name="serviceType"> The service to post to. See <see cref="SLRequest">Constants in SLRequest</see>.</param>
+		/// <param name="message"> The message to post or can be null.</param>
+		/// <param name="image"> The image to post or can be null.</param>
+		/// <param name="url"> The URL to post or can be null.</param>
+		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
+		/// <returns> True if it is able to show the native view controller; false if the service type is not available.</returns>
+		public static bool Post(string serviceType, string message, UIImage image, String url, bool checkServiceAvailable) {
 			if (checkServiceAvailable && !SLComposeViewController.IsAvailable(serviceType))
 				return false;
-			
+
 			var vc = SLComposeViewController.ComposeViewController(serviceType);
+			if (vc.IsNil)
+				return false;
+
 			vc.completionHandler = _composeViewCompleted;
-			
+
 			if (message != null)
 				vc.SetInitialText(message);
-			
+
 			if (image != null)
-				vc.AddImage(UIImage.FromTexture2D(image));
-			
+				vc.AddImage(image);
+
 			if (url != null)
 				vc.AddURL(new NSURL(url));
-			
+
 			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
@@ -189,6 +221,9 @@ namespace U3DXT.iOS.Social {
 				return false;
 			
 			var vc = new MFMailComposeViewController();
+			if (vc.IsNil)
+				return false;
+
 			vc.mailComposeDelegate = MailComposeViewControllerDelegate.instance;
 			vc.SetToRecipients(recipients);
 			vc.SetSubject(subject);
@@ -199,6 +234,39 @@ namespace U3DXT.iOS.Social {
 				vc.AddAttachmentData(nsdata, "image/png", "image.png");
 			}
 			
+			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			return true;
+		}
+
+		/// <summary>
+		/// Shows the native MFMailComposeViewController to send an email.
+		/// Raises MailCompleted event when completed.</summary>
+		/// 
+		/// <param name="recipients"> An array of strings representing the email addresses of the recipients.</param>
+		/// <param name="subject"> The subject of the email.</param>
+		/// <param name="body"> The body of the email.</param>
+		/// <param name="bodyIsHTML"> True if the body is HTML; false otherwise.</param>
+		/// <param name="image"> The image to attach to the email.</param>
+		/// <param name="checkServiceAvailable"> Whether to check if the service is available first.</param>
+		/// <returns> True if it is able to show the native view controller; false if it cannot send email.</returns>
+		public static bool Mail(string[] recipients, string subject, string body, bool bodyIsHTML, UIImage image, bool checkServiceAvailable) {
+			if (checkServiceAvailable && !MFMailComposeViewController.CanSendMail())
+				return false;
+
+			var vc = new MFMailComposeViewController();
+			if (vc.IsNil)
+				return false;
+
+			vc.mailComposeDelegate = MailComposeViewControllerDelegate.instance;
+			vc.SetToRecipients(recipients);
+			vc.SetSubject(subject);
+			vc.SetMessageBody(body, bodyIsHTML);
+
+			if (image != null) {
+				var nsdata = image.PNGRepresentation();
+				vc.AddAttachmentData(nsdata, "image/png", "image.png");
+			}
+
 			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
@@ -221,6 +289,9 @@ namespace U3DXT.iOS.Social {
 				return false;
 			
 			var vc = new MFMessageComposeViewController();
+			if (vc.IsNil)
+				return false;
+
 			vc.messageComposeDelegate = MessageComposeViewControllerDelegate.instance;
 			vc.recipients = recipients;
 			vc.body = body;
@@ -234,6 +305,47 @@ namespace U3DXT.iOS.Social {
 				_smsCompletedHandlers(null, new SMSCompletedEventArgs(result));
 		}
 
+		/// <summary>
+		/// Open Instagram with the specified texture and caption.
+		/// </summary>
+		/// <returns><c>true</c> if Instagram is installed, <c>false</c> otherwise.</returns>
+		/// <param name="texture">Texture.</param>
+		/// <param name="caption">Caption.</param>
+		public static bool Instagram(Texture2D texture, string caption = null) {
+			UIImage image = UIImage.FromTexture2D(texture);
+			return Instagram(image, caption);
+		}
+
+		/// <summary>
+		/// Open Instagram with the specified image and caption.
+		/// </summary>
+		/// <returns><c>true</c> if Instagram is installed, <c>false</c> otherwise.</returns>
+		/// <param name="image">Image.</param>
+		/// <param name="caption">Caption.</param>
+		public static bool Instagram(UIImage image, string caption = null) {
+			if (!UIApplication.SharedApplication().CanOpenURL(new NSURL("instagram://app")))
+				return false;
+
+			// write image to tmp folder
+			NSData data = image.JPEGRepresentation(1f);
+			string filePath = Application.temporaryCachePath + "/" + UUID.Generate() + ".igo";
+			data.WriteToFile(filePath, true);
+
+			_documentIC = UIDocumentInteractionController.InteractionController(new NSURL(filePath, false));
+			_documentIC.UTI = "com.instagram.exclusivegram";
+			if (caption != null) {
+				var annotation = new Dictionary<object, object>();
+				annotation["InstagramCaption"] = caption;
+				_documentIC.annotation = annotation;
+			}
+
+			var rootView = UIApplication.SharedApplication().keyWindow.rootViewController.view;
+			_documentIC.PresentOpenInMenu(new Rect(0, 0, 1, 1), rootView, true);
+			return true;
+		}
+
 #endregion
 	}
 }
+
+#endif

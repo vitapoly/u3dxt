@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 
 namespace U3DXT.iOS.GUI {
@@ -42,3 +44,4 @@ namespace U3DXT.iOS.GUI {
 	}
 }
 
+#endif

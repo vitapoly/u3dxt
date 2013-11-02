@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.Foundation;
 using U3DXT.iOS.Native.GameKit;
@@ -519,3 +521,4 @@ namespace U3DXT.iOS.GameKit {
 	}
 }
 
+#endif

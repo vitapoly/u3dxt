@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 
 
@@ -22,3 +24,4 @@ namespace U3DXT.iOS.Personal{
 	}
 }
 
+#endif

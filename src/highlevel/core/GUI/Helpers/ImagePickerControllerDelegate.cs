@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.UIKit;
 using System.Collections.Generic;
@@ -39,3 +41,4 @@ using U3DXT.iOS.GUI;
 //	}
 //}
 
+#endif

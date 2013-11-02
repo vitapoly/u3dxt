@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.Foundation;
 using U3DXT.iOS.Native.StoreKit;
@@ -92,3 +94,4 @@ namespace U3DXT.iOS.IAP {
 	}
 }
 
+#endif

@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Multipeer;
 using U3DXT.iOS.Native.MultipeerConnectivity;
@@ -32,3 +34,5 @@ namespace U3DXT.iOS.Multipeer.Helpers
 
 	}
 }
+
+#endif

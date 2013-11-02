@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT;
 using U3DXT.iOS.Native.UIKit;
@@ -35,6 +37,8 @@ namespace U3DXT.iOS.Social {
 		
 		/// <summary>
 		/// Initializes Facebook with a Facebook app ID and an array of permissions.
+		/// Raises InitializationCompleted event when completed, or InitializationFailed event when failed.
+		/// You can get the account information with the <c>account</c> property after successful initialization.
 		/// </summary>
 		/// <remarks>The Facebook app must enable iOS integration, and the bundle ID of the mobile app must be the same
 		/// as registered on the Facebook app.
@@ -50,6 +54,8 @@ namespace U3DXT.iOS.Social {
 			_options[ACAccountStore.ACFacebookAppIdKey] = appID;
 			_options[ACAccountStore.ACFacebookAudienceKey] = ACAccountStore.ACFacebookAudienceFriends;
 			_options[ACAccountStore.ACFacebookPermissionsKey] = permissions;
+
+			_Init();
 		}
 		
 		/// <summary>
@@ -200,3 +206,4 @@ namespace U3DXT.iOS.Social {
 	}
 }
 
+#endif

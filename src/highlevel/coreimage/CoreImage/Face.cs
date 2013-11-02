@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using UnityEngine;
 
@@ -116,3 +118,4 @@ namespace U3DXT.iOS.CoreImage {
 	}
 }
 
+#endif

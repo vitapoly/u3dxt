@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.CoreImage;
 using System.Collections.Generic;
@@ -239,3 +241,4 @@ namespace U3DXT.iOS.CoreImage {
 	}
 }
 
+#endif

@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -113,6 +115,13 @@ namespace U3DXT.iOS.IAP {
 		/// </summary>
 		public static bool displayActivityIndicator = true;
 
+		/// <summary>
+		/// Indicates whether to use encryption to cache which products the user has bought on local install.
+		/// This makes it more difficult for users to modify the PlayerPref to hack bought products.
+		/// If you want to disable using encryption, set this to false.
+		/// </summary>
+		public static bool useEncryptionForCache = true;
+
 #endregion
 
 #region methods
@@ -125,7 +134,9 @@ namespace U3DXT.iOS.IAP {
 		private static void _ReadCache() {
 			try {
 				var data = PlayerPrefs.GetString("U3DXT.iOS.IAP.BOUGHT_PRODUCTS");
-				var json = Encryption.DecryptToString(data, _encryptPass);
+				var json = data;
+				if (useEncryptionForCache)
+					json = Encryption.DecryptToString(data, _encryptPass);
 				_boughtProducts = new HashSet<string>((Json.Deserialize(json) as List<object>).Cast<string>().ToArray());
 			} catch (Exception) {
 				_boughtProducts = new HashSet<string>();
@@ -134,7 +145,9 @@ namespace U3DXT.iOS.IAP {
 
 		private static void _WriteCache() {
 			var json = Json.Serialize(_boughtProducts.ToList());
-			var data = Encryption.EncryptFromString(json, _encryptPass);
+			var data = json;
+			if (useEncryptionForCache)
+				data = Encryption.EncryptFromString(json, _encryptPass);
 
 			PlayerPrefs.SetString("U3DXT.iOS.IAP.BOUGHT_PRODUCTS", data);
 			PlayerPrefs.Save();
@@ -485,3 +498,5 @@ namespace U3DXT.iOS.IAP {
 #endregion
 	}
 }
+
+#endif

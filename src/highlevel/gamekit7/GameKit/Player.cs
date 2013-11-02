@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Internals;
 using UnityEngine;
@@ -89,7 +91,9 @@ namespace U3DXT.iOS.GameKit {
 				if (error == null) {
 					UnloadPhoto();
 
-					_photo = image.ToTexture2D();
+					if (image != null)
+						_photo = image.ToTexture2D();
+
 					completionCallback(_photo);
 				} else {
 					completionCallback(null);
@@ -164,3 +168,4 @@ namespace U3DXT.iOS.GameKit {
 	}
 }
 
+#endif

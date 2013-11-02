@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT;
 using U3DXT.iOS.Native.UIKit;
@@ -31,6 +33,15 @@ namespace U3DXT.iOS.Social {
 		/// Initializes a new instance of the <see cref="U3DXT.iOS.Social.SinaWeibo"/> class.
 		/// </summary>
 		public SinaWeibo() : base(ACAccountType.IdentifierSinaWeibo, SLRequest.SLServiceTypeSinaWeibo) {
+		}
+
+		/// <summary>
+		/// Initializes Sina Weibo.
+		/// Raises InitializationCompleted event when completed, or InitializationFailed event when failed.
+		/// You can get the account information with the <c>account</c> property after successful initialization.
+		/// </summary>
+		public void Init() {
+			_Init();
 		}
 		
 		/// <summary>
@@ -196,3 +207,4 @@ namespace U3DXT.iOS.Social {
 	}
 }
 
+#endif

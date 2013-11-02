@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -113,3 +115,5 @@ namespace U3DXT.iOS.MediaPlayer {
 #endregion
 	}
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.UIKit;
 using UnityEngine;
@@ -70,3 +72,4 @@ namespace U3DXT.iOS.IAP.Helpers {
 	}
 }
 
+#endif

@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.AVFoundation;
 using U3DXT.iOS.Native.Foundation;
@@ -43,3 +45,4 @@ namespace U3DXT.iOS.Speech.Helpers {
 	}
 }
 
+#endif

@@ -1,7 +1,10 @@
+#if (UNITY_EDITOR || UNITY_IPHONE)
+
 using System;
 using U3DXT.iOS.Native.UIKit;
 using U3DXT.iOS.Native.Foundation;
 //using U3DXT.iOS.GUI.Helpers;
+using U3DXT.Core;
 
 namespace U3DXT.iOS.GUI {
 	/// <summary>
@@ -28,6 +31,7 @@ namespace U3DXT.iOS.GUI {
 		}
 
 		private static UIImagePickerController _picker;
+		private static UIPopoverController _popover;
 
 		/// <summary>
 		/// Shows the image picker.
@@ -40,15 +44,38 @@ namespace U3DXT.iOS.GUI {
 			_picker.DidFinishPickingMediaWithInfo += _OnPickedMedia;
 			_picker.DidCancel += _OnCancelledPick;
 
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(_picker, true, null);
+			var rootVc = UIApplication.SharedApplication().keyWindow.rootViewController;
+			if (CoreXT.IsiPad && (source != UIImagePickerControllerSourceType.Camera)) {
+				if (_popover == null)
+					_popover = new UIPopoverController(_picker);
+				else
+					_popover.contentViewController = _picker;
+
+				var rect = rootVc.view.bounds;
+				rect.x = rect.width / 2;
+				rect.y = rect.height;
+				rect.width = 1;
+				rect.height = 1;
+				_popover.PresentPopover(
+					rect,
+					rootVc.view,
+					UIPopoverArrowDirection.Down,
+					true);
+			} else {
+				rootVc.PresentViewController(_picker, true, null);
+			}
 		}
 
 		private static void _OnPickedMedia(object sender, UIImagePickerController.DidFinishPickingMediaWithInfoEventArgs e) {
-			if (_picker.parentViewController != null)
+			if (_popover != null)
+				_popover.DismissPopover(true);
+			else if (_picker.parentViewController != null)
 				_picker.parentViewController.DismissViewController(true, null);
 			else
 				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+
 			_picker = null;
+			_popover = null;
 
 			var image = e.info[UIImagePickerController.OriginalImage] as UIImage;
 
@@ -62,6 +89,7 @@ namespace U3DXT.iOS.GUI {
 			else
 				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
 			_picker = null;
+			_popover = null;
 
 			if (_mediaPickCancelledHandlers != null)
 				_mediaPickCancelledHandlers(null, EventArgs.Empty);
@@ -163,3 +191,4 @@ namespace U3DXT.iOS.GUI {
 	}
 }
 
+#endif
