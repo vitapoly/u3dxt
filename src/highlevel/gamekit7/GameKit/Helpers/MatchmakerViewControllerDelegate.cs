@@ -21,19 +21,19 @@ namespace U3DXT.iOS.GameKit.Helpers {
 		}
 
 		public override void DidFail(GKMatchmakerViewController viewController, NSError error) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			RealTimeMatchesController._OnMatchMakerFailed(error);
 		}
 
 		public override void WasCancelled(GKMatchmakerViewController viewController) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			RealTimeMatchesController._OnMatchMakerCancelled();
 		}
 
 		public override void DidFindMatch(GKMatchmakerViewController viewController, GKMatch match) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			RealTimeMatchesController.SetCurrentMatch(match);
 		}

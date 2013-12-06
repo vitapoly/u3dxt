@@ -10,7 +10,7 @@ namespace U3DXT.iOS.GUI {
 	/// <summary>
 	/// High-level API for GUI.
 	/// </summary>
-	public class GUIXT {
+	public static class GUIXT {
 
 		private static EventHandler<MediaPickedEventArgs> _mediaPickedHandlers;
 		/// <summary>
@@ -44,7 +44,7 @@ namespace U3DXT.iOS.GUI {
 			_picker.DidFinishPickingMediaWithInfo += _OnPickedMedia;
 			_picker.DidCancel += _OnCancelledPick;
 
-			var rootVc = UIApplication.SharedApplication().keyWindow.rootViewController;
+			var rootVc = UIApplication.deviceRootViewController;
 			if (CoreXT.IsiPad && (source != UIImagePickerControllerSourceType.Camera)) {
 				if (_popover == null)
 					_popover = new UIPopoverController(_picker);
@@ -72,7 +72,7 @@ namespace U3DXT.iOS.GUI {
 			else if (_picker.parentViewController != null)
 				_picker.parentViewController.DismissViewController(true, null);
 			else
-				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+				UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			_picker = null;
 			_popover = null;
@@ -87,7 +87,7 @@ namespace U3DXT.iOS.GUI {
 			if (_picker.parentViewController != null)
 				_picker.parentViewController.DismissViewController(true, null);
 			else
-				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+				UIApplication.deviceRootViewController.DismissViewController(true, null);
 			_picker = null;
 			_popover = null;
 
@@ -184,9 +184,6 @@ namespace U3DXT.iOS.GUI {
 			}
 
 			_alertView = null;
-		}
-
-		private GUIXT() {
 		}
 	}
 }

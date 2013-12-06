@@ -240,7 +240,7 @@ namespace U3DXT.iOS.GameKit {
 			mmvc.turnBasedMatchmakerDelegate = TurnBasedMatchmakerViewControllerDelegate.instance;
 
 			// show it
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(mmvc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(mmvc, true, null);
 		}
 
 		internal static void _OnMatchMakerFailed(NSError error) {
@@ -302,7 +302,7 @@ namespace U3DXT.iOS.GameKit {
 
 						matches[i].ReloadPlayers(delegate() {
 							totalLoaded++;
-							if (totalLoaded == gkmatches.Length) {
+							if (totalLoaded == matches.Length) {
 								callback(matches, error);
 								callback = null;
 								matches = null;

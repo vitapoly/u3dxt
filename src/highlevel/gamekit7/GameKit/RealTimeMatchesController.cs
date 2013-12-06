@@ -100,7 +100,7 @@ namespace U3DXT.iOS.GameKit {
 				var mmvc = new GKMatchmakerViewController(acceptedInvite);
 				mmvc.matchmakerDelegate = MatchmakerViewControllerDelegate.instance;
 
-				UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(mmvc, true, null);
+				UIApplication.deviceRootViewController.PresentViewController(mmvc, true, null);
 
 				// load players and dispatch event
 				Player.LoadPlayersByIDs(new string[] {acceptedInvite.inviter}, delegate(Player[] players) {
@@ -189,7 +189,7 @@ namespace U3DXT.iOS.GameKit {
 			mmvc.matchmakerDelegate = MatchmakerViewControllerDelegate.instance;
 
 			// show it
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(mmvc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(mmvc, true, null);
 		}
 
 		internal static void _OnMatchMakerFailed(NSError error) {

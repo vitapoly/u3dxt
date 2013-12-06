@@ -19,23 +19,23 @@ namespace U3DXT.iOS.CoreImage {
 		/// <summary>
 		/// The preprocess image scale.
 		/// </summary>
-		public float PreprocessImageScale = 1.0f;//0.125f;
+		private float preprocessImageScale = 1.0f;//0.125f;
 
 		/// <summary>
 		/// The projected scale.
 		/// </summary>
-		public float ProjectedScale = 1.0f;
+		public float projectedScale = 1.0f;
 		private float _finalScale;
 
 		/// <summary>
 		/// The correct orientation.
 		/// </summary>
-		public bool CorrectOrientation = true;
+		public bool correctOrientation = true;
 
 		/// <summary>
 		/// The is mirrored.
 		/// </summary>
-		public bool IsMirrored = false;
+		public bool isMirrored = false;
 
 
 
@@ -55,7 +55,7 @@ namespace U3DXT.iOS.CoreImage {
 			_detector = CIDetector.DetectorOfType(CIDetector.TypeFace, context, opts);
 
 			if (useHighAccuracy)
-				PreprocessImageScale = 1.0f;
+				preprocessImageScale = 1.0f;
 		}
 
 		/// <summary>
@@ -90,9 +90,9 @@ namespace U3DXT.iOS.CoreImage {
 		/// <param name="imageOrientation">Image orientation.</param>
 		public Face[] DetectInImage(CIImage ciimage, CGImageOrientation imageOrientation = CGImageOrientation.Default) {
 			var rect = ciimage.Extent();
-			int imageHeight = (int)(rect.height * PreprocessImageScale);
-			int imageWidth = (int)(rect.width * PreprocessImageScale);
-			_finalScale = ProjectedScale / PreprocessImageScale;
+			int imageHeight = (int)(rect.height * preprocessImageScale);
+			int imageWidth = (int)(rect.width * preprocessImageScale);
+			_finalScale = projectedScale / preprocessImageScale;
 
 			// create CIImage from bitmapdata
 //			var ciimage:CIImage = CIImage.fromBitmapData(image, preprocessImageScale); //TODO
@@ -149,13 +149,13 @@ namespace U3DXT.iOS.CoreImage {
 			rect.y = imageHeight - rect.y - rect.height;
 
 			// rotate coords
-			if (CorrectOrientation) {
+			if (correctOrientation) {
 				float temp;
 				switch (imageOrientation) {
 					case CGImageOrientation.UpsideDown:
 						rect.x = imageWidth - rect.x - rect.width;
 						rect.y = imageHeight - rect.y - rect.height;
-						if (IsMirrored)
+						if (isMirrored)
 							rect.x = imageHeight - rect.x;
 						break;
 					case CGImageOrientation.RotatedLeft:
@@ -165,7 +165,7 @@ namespace U3DXT.iOS.CoreImage {
 						temp = rect.width;
 						rect.width = rect.height;
 						rect.height = temp;
-						if (IsMirrored)
+						if (isMirrored)
 							rect.x = imageWidth - rect.x;
 						break;
 					case CGImageOrientation.RotatedRight:
@@ -175,11 +175,11 @@ namespace U3DXT.iOS.CoreImage {
 						temp = rect.width;
 						rect.width = rect.height;
 						rect.height = temp;
-						if (IsMirrored)
+						if (isMirrored)
 							rect.x = imageWidth - rect.x;
 						break;
 					default:
-						if (IsMirrored)
+						if (isMirrored)
 							rect.x = imageHeight - rect.x;
 						break;
 				}
@@ -200,31 +200,31 @@ namespace U3DXT.iOS.CoreImage {
 			point.y = imageHeight - point.y;
 
 			// rotate coords
-			if (CorrectOrientation) {
+			if (correctOrientation) {
 				float temp;
 				switch (imageOrientation) {
 					case CGImageOrientation.UpsideDown:
 						point.x = imageWidth - point.x;
 						point.y = imageHeight - point.y;
-						if (IsMirrored)
+						if (isMirrored)
 							point.x = imageHeight - point.x;
 						break;
 					case CGImageOrientation.RotatedLeft:
 						temp = point.x;
 						point.x = imageHeight - point.y;
 						point.y = temp;
-						if (IsMirrored)
+						if (isMirrored)
 							point.x = imageWidth - point.x;
 						break;
 					case CGImageOrientation.RotatedRight:
 						temp = point.y;
 						point.y = imageWidth - point.x;
 						point.x = temp;
-						if (IsMirrored)
+						if (isMirrored)
 							point.x = imageWidth - point.x;
 						break;
 					default:
-						if (IsMirrored)
+						if (isMirrored)
 							point.x = imageHeight - point.x;
 						break;
 				}

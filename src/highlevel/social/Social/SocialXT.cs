@@ -116,7 +116,7 @@ namespace U3DXT.iOS.Social {
 			if (excludedActivityTypes != null)
 				vc.excludedActivityTypes = excludedActivityTypes;
 			
-			var rootVc = UIApplication.SharedApplication().keyWindow.rootViewController;
+			var rootVc = UIApplication.deviceRootViewController;
 			if (CoreXT.IsiPad) {
 				if (_popover == null)
 					_popover = new UIPopoverController(vc);
@@ -193,14 +193,14 @@ namespace U3DXT.iOS.Social {
 			if (url != null)
 				vc.AddURL(new NSURL(url));
 
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
 		
 		private static void _composeViewCompleted(SLComposeViewControllerResult result) {
-			if (UIApplication.SharedApplication().keyWindow.rootViewController != null)
-				UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
-			
+			if (UIApplication.deviceRootViewController != null)
+				UIApplication.deviceRootViewController.DismissViewController(true, null);
+
 			if (_postCompletedHandlers != null)
 				_postCompletedHandlers(null, new PostCompletedEventArgs(result == SLComposeViewControllerResult.Done));
 		}
@@ -219,7 +219,7 @@ namespace U3DXT.iOS.Social {
 		public static bool Mail(string[] recipients, string subject, string body, bool bodyIsHTML, Texture2D image = null, bool checkServiceAvailable = true) {
 			if (checkServiceAvailable && !MFMailComposeViewController.CanSendMail())
 				return false;
-			
+
 			var vc = new MFMailComposeViewController();
 			if (vc.IsNil)
 				return false;
@@ -234,7 +234,7 @@ namespace U3DXT.iOS.Social {
 				vc.AddAttachmentData(nsdata, "image/png", "image.png");
 			}
 			
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
 
@@ -267,7 +267,7 @@ namespace U3DXT.iOS.Social {
 				vc.AddAttachmentData(nsdata, "image/png", "image.png");
 			}
 
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
 		
@@ -296,7 +296,7 @@ namespace U3DXT.iOS.Social {
 			vc.recipients = recipients;
 			vc.body = body;
 			
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(vc, true, null);
 			return true;
 		}
 		
@@ -339,7 +339,7 @@ namespace U3DXT.iOS.Social {
 				_documentIC.annotation = annotation;
 			}
 
-			var rootView = UIApplication.SharedApplication().keyWindow.rootViewController.view;
+			var rootView = UIApplication.deviceRootViewController.view;
 			_documentIC.PresentOpenInMenu(new Rect(0, 0, 1, 1), rootView, true);
 			return true;
 		}

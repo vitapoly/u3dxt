@@ -100,7 +100,7 @@ namespace U3DXT.iOS.GameKit {
 				gkLocalPlayer.authenticateHandler = delegate(UIViewController viewController, NSError error) {
 					if (viewController != null) {
 						_localPlayer = null;
-						UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(viewController, true, null);
+						UIApplication.deviceRootViewController.PresentViewController(viewController, true, null);
 					} else {
 						_CheckLocalPlayer(error);
 						error = null;
@@ -149,7 +149,7 @@ namespace U3DXT.iOS.GameKit {
 
 			vc.gameCenterDelegate = GameCenterControllerDelegate.instance;
 
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(vc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(vc, true, null);
 		}
 
 		/// <summary>
@@ -205,7 +205,7 @@ namespace U3DXT.iOS.GameKit {
 				gcvc.leaderboardTimeScope = GKLeaderboardTimeScope.Today;
 				gcvc.leaderboardCategory = leaderboardID;
 
-				UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(gcvc, true, null);
+				UIApplication.deviceRootViewController.PresentViewController(gcvc, true, null);
 
 			} else {
 				var lbvc = new GKLeaderboardViewController();
@@ -213,7 +213,7 @@ namespace U3DXT.iOS.GameKit {
 				lbvc.timeScope = GKLeaderboardTimeScope.Today;
 				lbvc.category = leaderboardID;
 
-				UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(lbvc, true, null);
+				UIApplication.deviceRootViewController.PresentViewController(lbvc, true, null);
 			}
 		}
 
@@ -256,13 +256,13 @@ namespace U3DXT.iOS.GameKit {
 				gcvc.gameCenterDelegate = GameCenterControllerDelegate.instance;
 				gcvc.viewState = GKGameCenterViewControllerState.Achievements;
 
-				UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(gcvc, true, null);
+				UIApplication.deviceRootViewController.PresentViewController(gcvc, true, null);
 
 			} else {
 				var avc = new GKAchievementViewController();
 				avc.achievementDelegate = AchievementViewControllerDelegate.instance;
 
-				UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(avc, true, null);
+				UIApplication.deviceRootViewController.PresentViewController(avc, true, null);
 			}
 		}
 

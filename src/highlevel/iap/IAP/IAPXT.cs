@@ -120,6 +120,7 @@ namespace U3DXT.iOS.IAP {
 		/// This makes it more difficult for users to modify the PlayerPref to hack bought products.
 		/// If you want to disable using encryption, set this to false.
 		/// </summary>
+		[Obsolete("This is not used anymore because it always uses simple encryption which does not violate export laws.")]
 		public static bool useEncryptionForCache = true;
 
 #endregion
@@ -130,14 +131,35 @@ namespace U3DXT.iOS.IAP {
 			_ReadCache();
 		}
 
-		private static string _encryptPass = "asdlij23r8jcvi38";
+		private static string _encryptKey = "u3d";
+		/// <summary>
+		/// Gets or sets the encryption key.
+		/// Default is "u3d" for a key size of 48 bits, and thus not violating export laws.
+		/// </summary>
+		/// <value>The encryption key.</value>
+		public static string encryptionKey {
+			get { return _encryptKey; }
+			set {
+				_encryptKey = value;
+				_ReadCache();
+			}
+		}
+
 		private static void _ReadCache() {
 			try {
 				var data = PlayerPrefs.GetString("U3DXT.iOS.IAP.BOUGHT_PRODUCTS");
 				var json = data;
-				if (useEncryptionForCache)
-					json = Encryption.DecryptToString(data, _encryptPass);
-				_boughtProducts = new HashSet<string>((Json.Deserialize(json) as List<object>).Cast<string>().ToArray());
+				var obj = Json.Deserialize(json);
+				if (obj == null) {
+					json = Encryption.SimpleDecryptToString(data, _encryptKey);
+					obj = Json.Deserialize(json);
+				}
+
+				if (obj == null) {
+					_boughtProducts = new HashSet<string>();
+				} else {
+					_boughtProducts = new HashSet<string>((obj as List<object>).Cast<string>().ToArray());
+				}
 			} catch (Exception) {
 				_boughtProducts = new HashSet<string>();
 			}
@@ -145,9 +167,7 @@ namespace U3DXT.iOS.IAP {
 
 		private static void _WriteCache() {
 			var json = Json.Serialize(_boughtProducts.ToList());
-			var data = json;
-			if (useEncryptionForCache)
-				data = Encryption.EncryptFromString(json, _encryptPass);
+			var data = Encryption.SimpleEncryptFromString(json, _encryptKey);
 
 			PlayerPrefs.SetString("U3DXT.iOS.IAP.BOUGHT_PRODUCTS", data);
 			PlayerPrefs.Save();
@@ -180,7 +200,7 @@ namespace U3DXT.iOS.IAP {
 			}
 
 			// raise event
-			if (e.response.invalidProductIdentifiers.Length == 0) {
+			if ((e.response.invalidProductIdentifiers == null) || (e.response.invalidProductIdentifiers.Length == 0)) {
 				if (_initializationCompletedHandlers != null)
 					_initializationCompletedHandlers(null, new InitializationEventArgs(e.response));
 			} else {
@@ -467,7 +487,7 @@ namespace U3DXT.iOS.IAP {
 			_storeViewController.LoadProduct(param, delegate(bool result, NSError error) {
 				if (result) {
 					_storeViewController.DidFinish += _ShowStoreDidFinish;
-					UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(_storeViewController, true, null);
+					UIApplication.deviceRootViewController.PresentViewController(_storeViewController, true, null);
 				} else {
 					if (_storeViewLoadFailedHandlers != null)
 						_storeViewLoadFailedHandlers(null, new U3DXTErrorEventArgs(error));

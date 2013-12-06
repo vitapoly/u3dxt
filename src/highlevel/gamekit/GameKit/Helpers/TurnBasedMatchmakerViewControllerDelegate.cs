@@ -20,19 +20,19 @@ namespace U3DXT.iOS.GameKit.Helpers {
 		}
 
 		public override void DidFail(GKTurnBasedMatchmakerViewController viewController, NSError error) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			TurnBasedMatchesController._OnMatchMakerFailed(error);
 		}
 
 		public override void WasCancelled(GKTurnBasedMatchmakerViewController viewController) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			TurnBasedMatchesController._OnMatchMakerCancelled();
 		}
 
 		public override void DidFind(GKTurnBasedMatchmakerViewController viewController, GKTurnBasedMatch match) {
-			UIApplication.SharedApplication().keyWindow.rootViewController.DismissViewController(true, null);
+			UIApplication.deviceRootViewController.DismissViewController(true, null);
 
 			TurnBasedMatchesController._OnMatchMakerFoundMatch(match);
 		}

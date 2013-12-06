@@ -274,6 +274,8 @@ namespace U3DXT.iOS.GameKit {
 		/// <value>All other participants.</value>
 		public TurnBasedParticipant[] allOtherParticipants {
 			get {
+				if (_participants == null)
+					return null;
 				var arr = new List<TurnBasedParticipant>();
 				foreach (var part in _participants) {
 					if (part.player != GameKitXT.localPlayer)
@@ -296,15 +298,20 @@ namespace U3DXT.iOS.GameKit {
 		/// </summary>
 		/// <param name="callback">Callback.</param>
 		public void ReloadPlayers(Action callback) {
-			var playerIDs = _participants.Select(x => x.playerID).ToArray();
-//			Debug.Log("ReloadPlayers IDs: " + Json.Serialize(playerIDs));
-			Player.LoadPlayersByIDs(playerIDs, delegate(Player[] players) {
-				for (int i=0; i<_participants.Length; i++) {
-					_participants[i]._player = players[i];
-				}
+			if (_participants == null) {
 				callback();
 				callback = null;
-			});
+			} else {
+				var playerIDs = _participants.Select(x => x.playerID).ToArray();
+	//			Debug.Log("ReloadPlayers IDs: " + Json.Serialize(playerIDs));
+				Player.LoadPlayersByIDs(playerIDs, delegate(Player[] players) {
+					for (int i=0; i<_participants.Length; i++) {
+						_participants[i]._player = players[i];
+					}
+					callback();
+					callback = null;
+				});
+			}
 		}
 
 		/// <summary>

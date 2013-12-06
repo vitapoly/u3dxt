@@ -124,7 +124,7 @@ namespace U3DXT.iOS.Multipeer {
 			_session.Delegate = SessionDelegate.instance;
 
 				
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(_browserVC, false, null);
+			UIApplication.deviceRootViewController.PresentViewController(_browserVC, false, null);
 		}
 		
 		/// <summary>

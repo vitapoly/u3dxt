@@ -75,8 +75,8 @@ namespace U3DXT.iOS.MediaPlayer {
 				_playerVC.moviePlayer.PrepareToPlay();
 			}
 
-//			UIApplication.SharedApplication().keyWindow.rootViewController.AddChildViewController(_playerVC);
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(_playerVC, false, null);
+//			UIApplication.deviceRootViewController.AddChildViewController(_playerVC);
+			UIApplication.deviceRootViewController.PresentViewController(_playerVC, false, null);
 
 		}
 

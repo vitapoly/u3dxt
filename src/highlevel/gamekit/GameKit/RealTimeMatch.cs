@@ -133,7 +133,7 @@ namespace U3DXT.iOS.GameKit {
 			var mmvc = new GKMatchmakerViewController(request);
 			mmvc.matchmakerDelegate = MatchmakerViewControllerDelegate.instance;
 
-			UIApplication.SharedApplication().keyWindow.rootViewController.PresentViewController(mmvc, true, null);
+			UIApplication.deviceRootViewController.PresentViewController(mmvc, true, null);
 		}
 
 		/// <summary>

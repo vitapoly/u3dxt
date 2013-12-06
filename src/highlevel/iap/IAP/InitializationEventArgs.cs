@@ -38,7 +38,10 @@ namespace U3DXT.iOS.IAP {
 		/// </summary>
 		/// <param name="response">Response.</param>
 		public InitializationEventArgs(SKProductsResponse response) {
-			invalidIDs = response.invalidProductIdentifiers.Cast<string>().ToArray();
+			if (response.invalidProductIdentifiers == null)
+				invalidIDs = new string[0];
+			else
+				invalidIDs = response.invalidProductIdentifiers.Cast<string>().ToArray();
 			products = response.products.Cast<SKProduct>().ToArray();
 //			InvalidIDs = invalidIDs;
 //			Products = products;

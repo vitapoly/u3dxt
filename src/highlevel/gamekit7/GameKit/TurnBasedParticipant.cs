@@ -92,6 +92,8 @@ namespace U3DXT.iOS.GameKit {
 		}
 
 		internal static TurnBasedParticipant[] ToParticipants(object[] gkParticipants) {
+			if (gkParticipants == null)
+				return null;
 			return gkParticipants.Select(x => NSObjectWrapper.CreateWrapper(typeof(TurnBasedParticipant), x as GKTurnBasedParticipant) as TurnBasedParticipant).ToArray();
 		}
 	}

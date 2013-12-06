@@ -17,9 +17,9 @@ namespace U3DXT.iOS.IAP.Helpers {
 		public void Show(string text) {
 			// figure out parent
 			UIView parentView = null;
-			if ((UIApplication.SharedApplication().keyWindow.rootViewController != null)
-			    && (UIApplication.SharedApplication().keyWindow.rootViewController.view != null))
-				parentView = UIApplication.SharedApplication().keyWindow.rootViewController.view;
+			if ((UIApplication.deviceRootViewController != null)
+			    && (UIApplication.deviceRootViewController.view != null))
+				parentView = UIApplication.deviceRootViewController.view;
 			else
 				parentView = UIApplication.SharedApplication().keyWindow;
 
