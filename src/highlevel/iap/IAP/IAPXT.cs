@@ -104,6 +104,7 @@ namespace U3DXT.iOS.IAP {
 #region vars
 
 		private static bool _initd = false;
+		private static string[] _initializingProductIDs = null;
 		private static Dictionary<string, SKProduct> _products = new Dictionary<string, SKProduct>();
 		private static HashSet<string> _boughtProducts = new HashSet<string>();
 		private static ActivityIndicator _activityIndicator = null;
@@ -187,9 +188,11 @@ namespace U3DXT.iOS.IAP {
 				_initd = true;
 			}
 
+			_initializingProductIDs = productIDs;
 			_request = new SKProductsRequest(productIDs);
 //			_request.Delegate = ProductsRequestDelegate.instance;
 			_request.DidReceive += _OnProductRequestReceive;
+			_request.DidFail += _OnProductRequestFail;
 			_request.Start();
 		}
 
@@ -207,6 +210,13 @@ namespace U3DXT.iOS.IAP {
 				if (_initializationFailedHandlers != null)
 					_initializationFailedHandlers(null, new InitializationEventArgs(e.response));
 			}
+
+			_request = null;
+		}
+
+		internal static void _OnProductRequestFail(object sender, SKRequest.DidFailEventArgs e) {
+			if (_initializationFailedHandlers != null)
+				_initializationFailedHandlers(null, new InitializationEventArgs(_initializingProductIDs, e.error));
 
 			_request = null;
 		}

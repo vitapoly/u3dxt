@@ -70,19 +70,21 @@ namespace U3DXT.iOS.Social {
 		/// <summary> U3DXT internal. </summary>
 		protected void _Init() {
 			_service.RequestAccessToAccounts(_accountType, _options, delegate(bool granted, NSError error) {
-				if (granted) {
-					var accounts = _service.FindAccounts(_accountType);
-					if ((accounts != null) && (accounts.Length > 0)) {
-						_account = accounts[0] as ACAccount;
-						if (_initializationCompletedHandlers != null)
-							_initializationCompletedHandlers(this, EventArgs.Empty);
-						return;
+				CoreXT.RunOnMainThread(delegate() {
+					if (granted) {
+						var accounts = _service.FindAccounts(_accountType);
+						if ((accounts != null) && (accounts.Length > 0)) {
+							_account = accounts[0] as ACAccount;
+							if (_initializationCompletedHandlers != null)
+								_initializationCompletedHandlers(this, EventArgs.Empty);
+							return;
+						}
 					}
-				}
 
-				_account = null;
-				if (_initializationFailedHandlers != null)
-					_initializationFailedHandlers(this, (error != null) ? new U3DXTErrorEventArgs(error) : new U3DXTErrorEventArgs(0, "", "No account setup or permission denied."));
+					_account = null;
+					if (_initializationFailedHandlers != null)
+						_initializationFailedHandlers(this, (error != null) ? new U3DXTErrorEventArgs(error) : new U3DXTErrorEventArgs(0, "", "No account setup or permission denied."));
+				});
 			});
 		}
 
@@ -156,35 +158,39 @@ namespace U3DXT.iOS.Social {
 		
 		private void _Request(string url, SLRequestMethod method, Dictionary<object, object> parameters, Action<object, NSHTTPURLResponse, NSError> callback) {
 			_service.RequestAccessToAccounts(_accountType, _options, delegate(bool granted, NSError error) {
-				if (granted) {
-					var account = _service.FindAccounts(_accountType)[0] as ACAccount;
-					var request = SLRequest.Request(
-						_serviceType,
-						method,
-						new NSURL(url),
-						parameters);
-					request.account = account;
-					
-					request.PerformRequest(delegate(NSData responseData, NSHTTPURLResponse urlResponse, NSError error2) {
-						object obj = null;
-						var response = Encoding.UTF8.GetString(responseData.ToByteArray());
-						try {
-							obj = Json.Deserialize(response);
-						} catch (Exception) {
-							obj = response;
-						}
-						callback(obj, urlResponse, error2);
+				CoreXT.RunOnMainThread(delegate() {
+					if (granted) {
+						var account = _service.FindAccounts(_accountType)[0] as ACAccount;
+						var request = SLRequest.Request(
+							_serviceType,
+							method,
+							new NSURL(url),
+							parameters);
+						request.account = account;
+						Debug.Log("prepared url: " + request.PreparedURLRequest().URL().AbsoluteString() + "\n" + Json.Serialize(request.PreparedURLRequest().AllHTTPHeaderFields())
+						          + "\n" + request.PreparedURLRequest().HTTPBody().ToByteArray().ToStraightString());
+
+						request.PerformRequest(delegate(NSData responseData, NSHTTPURLResponse urlResponse, NSError error2) {
+							object obj = null;
+							var response = Encoding.UTF8.GetString(responseData.ToByteArray());
+							try {
+								obj = Json.Deserialize(response);
+							} catch (Exception) {
+								obj = response;
+							}
+							callback(obj, urlResponse, error2);
+							callback = null;
+						});
+						
+						parameters = null;
+						account = null;
+						request = null;
+					} else {
+						callback(null, null, error);
+						parameters = null;
 						callback = null;
-					});
-					
-					parameters = null;
-					account = null;
-					request = null;
-				} else {
-					callback(null, null, error);
-					parameters = null;
-					callback = null;
-				}
+					}
+				});
 			});
 		}
 	}

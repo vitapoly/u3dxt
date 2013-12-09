@@ -4,6 +4,7 @@ using System;
 using U3DXT.iOS.Native.StoreKit;
 using System.Collections;
 using System.Linq;
+using U3DXT.iOS.Native.Foundation;
 
 namespace U3DXT.iOS.IAP {
 	/// <summary>
@@ -27,6 +28,11 @@ namespace U3DXT.iOS.IAP {
 		/// </summary>
 		public readonly SKProduct[] products;
 
+		/// <summary>
+		/// The error if exists.
+		/// </summary>
+		public readonly NSError error;
+
 //		/// <summary>
 //		/// The products.
 //		/// </summary>
@@ -43,8 +49,19 @@ namespace U3DXT.iOS.IAP {
 			else
 				invalidIDs = response.invalidProductIdentifiers.Cast<string>().ToArray();
 			products = response.products.Cast<SKProduct>().ToArray();
-//			InvalidIDs = invalidIDs;
-//			Products = products;
+
+			error = null;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="U3DXT.iOS.IAP.InitializationEventArgs"/> class.
+		/// </summary>
+		/// <param name="invalidIDs">Invalid IDs.</param>
+		/// <param name="error">Error.</param>
+		public InitializationEventArgs(string[] invalidIDs, NSError error) {
+			this.invalidIDs = invalidIDs;
+			this.error = error;
+			products = new SKProduct[0];
 		}
 	}
 }

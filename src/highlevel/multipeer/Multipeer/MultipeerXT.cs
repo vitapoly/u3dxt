@@ -20,7 +20,7 @@ namespace U3DXT.iOS.Multipeer {
 	public class MultipeerXT {
 
 #region events
-		
+
 		private static EventHandler<EventArgs> _browserCompletedHandlers;
 		/// <summary>
 		/// Occurs when a share operation has completed.
@@ -93,7 +93,20 @@ namespace U3DXT.iOS.Multipeer {
 		public static event EventHandler<SessionStartedReceivingResourceWithNameEventArgs> SessionStartedReceivingResourceWithName {
 			add { _sessionStartedReceivingResourceWithNameHandlers += value; }
 			remove { _sessionStartedReceivingResourceWithNameHandlers -= value; }
-		}		
+		}	
+
+
+		private static EventHandler<SessionDidReceiveCertificateEventArgs> _sessionDidReceiveCertificateHandlers;
+		/// <summary>
+		/// Occurs when a share operation has completed.
+		/// </summary>
+		public static event EventHandler<SessionDidReceiveCertificateEventArgs> SessionDidReceiveCertificate {
+			add { _sessionDidReceiveCertificateHandlers += value; }
+			remove { _sessionDidReceiveCertificateHandlers -= value; }
+		}	
+
+
+
 	
 #endregion
 
@@ -201,7 +214,15 @@ namespace U3DXT.iOS.Multipeer {
 				     new SessionStartedReceivingResourceWithNameEventArgs(session, resourceName, peerID, progress));
 		}
 
+		internal static bool OnSessionDidReceiveCertificate(MCSession session, object[] certificate, MCPeerID peerID) 
+		{
+			SessionDidReceiveCertificateEventArgs certArgs = new SessionDidReceiveCertificateEventArgs(session, certificate, peerID); 
 
+			if (_sessionDidReceiveCertificateHandlers != null)
+				_sessionDidReceiveCertificateHandlers(null, certArgs); 
+				     
+			return certArgs.acceptCertificate;
+		}
 			
 				
 				

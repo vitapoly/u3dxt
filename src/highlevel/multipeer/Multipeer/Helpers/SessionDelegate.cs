@@ -40,6 +40,13 @@ namespace U3DXT.iOS.Multipeer.Helpers
 			MultipeerXT.OnSessionDidStartReceivingResourceWithName(session, resourceName, peerID, progress);
 		}
 
+		/*
+		 * always return certicate to be accept
+		 */
+		public override bool DidReceiveCertificate(MCSession session, object[] certificate, MCPeerID peerID) {
+			return MultipeerXT.OnSessionDidReceiveCertificate(session, certificate, peerID);
+		}
+
 
 	}
 }
