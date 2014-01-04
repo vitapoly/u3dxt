@@ -167,8 +167,8 @@ namespace U3DXT.iOS.Social {
 							new NSURL(url),
 							parameters);
 						request.account = account;
-						Debug.Log("prepared url: " + request.PreparedURLRequest().URL().AbsoluteString() + "\n" + Json.Serialize(request.PreparedURLRequest().AllHTTPHeaderFields())
-						          + "\n" + request.PreparedURLRequest().HTTPBody().ToByteArray().ToStraightString());
+//						Debug.Log("prepared url: " + request.PreparedURLRequest().URL().AbsoluteString() + "\n" + Json.Serialize(request.PreparedURLRequest().AllHTTPHeaderFields())
+//						          + "\n" + request.PreparedURLRequest().HTTPBody().ToByteArray().ToStraightString());
 
 						request.PerformRequest(delegate(NSData responseData, NSHTTPURLResponse urlResponse, NSError error2) {
 							object obj = null;
