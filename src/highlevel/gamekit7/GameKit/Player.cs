@@ -93,9 +93,11 @@ namespace U3DXT.iOS.GameKit {
 
 					if (image != null)
 						_photo = image.ToTexture2D();
+//					Debug.Log("load photo callback: " + image + ", " + _photo);
 
 					completionCallback(_photo);
 				} else {
+//					Debug.Log("load photo error: " + error.Domain() + ", " + error.Code() + ", " + error.LocalizedDescription());
 					completionCallback(null);
 				}
 				completionCallback = null;
@@ -107,7 +109,7 @@ namespace U3DXT.iOS.GameKit {
 		/// </summary>
 		public void UnloadPhoto() {
 			if (_photo != null) {
-				Texture2D.Destroy(_photo);
+//				Texture2D.Destroy(_photo);
 				_photo = null;
 			}
 		}

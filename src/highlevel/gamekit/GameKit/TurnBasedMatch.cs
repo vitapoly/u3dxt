@@ -126,7 +126,12 @@ namespace U3DXT.iOS.GameKit {
 		public TurnBasedParticipant currentParticipant {
 			get {
 				var participant = gkTurnBasedMatch.currentParticipant;
-				return NSObjectWrapper.CreateWrapper(typeof(TurnBasedParticipant), participant) as TurnBasedParticipant;
+//				return NSObjectWrapper.CreateWrapper(typeof(TurnBasedParticipant), participant) as TurnBasedParticipant;
+				foreach (var part in _participants) {
+					if (part.playerID == participant.playerID)
+						return part;
+				}
+				return null;
 			}
 		}
 
@@ -257,7 +262,7 @@ namespace U3DXT.iOS.GameKit {
 				callback = null;
 			} else {
 				var playerIDs = _participants.Select(x => x.playerID).ToArray();
-				//			Debug.Log("ReloadPlayers IDs: " + Json.Serialize(playerIDs));
+	//			Debug.Log("ReloadPlayers IDs: " + Json.Serialize(playerIDs));
 				Player.LoadPlayersByIDs(playerIDs, delegate(Player[] players) {
 					for (int i=0; i<_participants.Length; i++) {
 						_participants[i]._player = players[i];
