@@ -173,9 +173,11 @@ namespace U3DXT.iOS.GameKit {
 			get {
 				var participant = gkTurnBasedMatch.currentParticipant;
 //				return NSObjectWrapper.CreateWrapper(typeof(TurnBasedParticipant), participant) as TurnBasedParticipant;
-				foreach (var part in _participants) {
-					if (part.playerID == participant.playerID)
-						return part;
+				if (participant != null) {
+					foreach (var part in _participants) {
+						if (part.playerID == participant.playerID)
+							return part;
+					}
 				}
 				return null;
 			}
