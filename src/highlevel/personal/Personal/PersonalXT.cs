@@ -77,7 +77,7 @@ namespace U3DXT.iOS.Personal {
 		public static void Init()
 		{
 			eventStore = new EKEventStore();
-			calendar = eventStore.defaultCalendarForNewEvents;
+			calendar = eventStore.defaultCalendarForNewEvents; //for the case where it is already granted
 		}
 
 
@@ -96,6 +96,9 @@ namespace U3DXT.iOS.Personal {
 		/// <param name="arg2">Arg2.</param>
 		private static void _RequestAccessToCalendarHandler(bool granted, NSError arg2)
 		{
+			if(granted)				
+				calendar = eventStore.defaultCalendarForNewEvents;
+
 			if (_calendarGrantedHandlers != null)
 				_calendarGrantedHandlers(null, new GrantedEventArgs(granted));
 		}
@@ -197,15 +200,12 @@ namespace U3DXT.iOS.Personal {
 		public static object[] GetEventsFromTo(DateTime fromDate, DateTime toDate)
 		{
 			DateTime startDate = fromDate;
-			DateTime endDate = toDate;		
-			
+			DateTime endDate = toDate;
 			object[] calenderArray = new object[1];
 			calenderArray[0] = calendar;
-			
 			NSPredicate predicate = eventStore.PredicateForEvents(startDate, endDate, calenderArray);
-
 			object[] eventObjs = eventStore.EventsMatchingPredicate(predicate);
-
+          	eventStore.SaveCalendar(calendar,true, null);
 			return eventObjs;
 		}
 

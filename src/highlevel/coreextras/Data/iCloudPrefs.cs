@@ -47,6 +47,7 @@ namespace U3DXT.iOS.Data {
 
 		/// <summary>
 		/// The iCloud ID, which is meaningless, just a way to identify between accounts.
+		/// Available in iOS 6.0 and later.
 		/// </summary>
 		/// <value>The iCloud ID.</value>
 		public static string iCloudID {
@@ -81,7 +82,10 @@ namespace U3DXT.iOS.Data {
 
 			string oldID = iCloudID;
 
-			object token = NSFileManager.DefaultManager().UbiquityIdentityToken();
+			object token = null;
+			if (NSFileManager.InstancesRespondToSelector("ubiquityIdentityToken"))
+				token = NSFileManager.DefaultManager().UbiquityIdentityToken();
+
 			if (token == null) {
 				iCloudID = null;
 				_userDefaults.RemoveObject(ID_KEY);

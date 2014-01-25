@@ -356,11 +356,13 @@ namespace U3DXT.iOS.IAP {
 
 		private static void _OnBought(SKPaymentTransaction transaction) {
 
-			_boughtProducts.Add(transaction.payment.productIdentifier);
-			_WriteCache();
+			if ((transaction.payment != null) && (transaction.payment.productIdentifier != null)) {
+				_boughtProducts.Add(transaction.payment.productIdentifier);
+				_WriteCache();
 
-			if (_transactionCompletedHandlers != null)
-				_transactionCompletedHandlers(null, new TransactionEventArgs(transaction));
+				if (_transactionCompletedHandlers != null)
+					_transactionCompletedHandlers(null, new TransactionEventArgs(transaction));
+			}
 
 			_FinishTransaction(transaction);
 		}
