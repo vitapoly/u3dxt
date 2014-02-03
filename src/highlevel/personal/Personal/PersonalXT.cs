@@ -77,7 +77,8 @@ namespace U3DXT.iOS.Personal {
 		public static void Init()
 		{
 			eventStore = new EKEventStore();
-			calendar = eventStore.defaultCalendarForNewEvents; //for the case where it is already granted
+			if(GetCalendarAccessStatus() == "Authorized")
+				calendar = eventStore.defaultCalendarForNewEvents; //for the case where it is already granted
 		}
 
 
@@ -199,13 +200,17 @@ namespace U3DXT.iOS.Personal {
 		/// </summary>
 		public static object[] GetEventsFromTo(DateTime fromDate, DateTime toDate)
 		{
+			Debug.Log("in GetEventsFromTo, output of calendar: " + calendar);
 			DateTime startDate = fromDate;
 			DateTime endDate = toDate;
 			object[] calenderArray = new object[1];
 			calenderArray[0] = calendar;
 			NSPredicate predicate = eventStore.PredicateForEvents(startDate, endDate, calenderArray);
 			object[] eventObjs = eventStore.EventsMatchingPredicate(predicate);
-          	eventStore.SaveCalendar(calendar,true, null);
+			if (eventObjs != null) {
+				eventStore.SaveCalendar(calendar, true, null);
+				eventStore.Commit(null);
+			}
 			return eventObjs;
 		}
 
@@ -217,8 +222,10 @@ namespace U3DXT.iOS.Personal {
 		/// <param name="toDate">To date.</param>
 		public static void CreateSimpleEvent(string titleTxt,DateTime fromDate, DateTime toDate )
 		{
+
 			EKEvent newEvent = EKEvent.Event(eventStore);		
-		
+			calendar = eventStore.defaultCalendarForNewEvents;
+			Debug.Log("in CreateSimpleEvent, output of calendar: " + calendar);
 			newEvent.title = titleTxt;
 			newEvent.startDate = fromDate;
 			newEvent.endDate = toDate;
@@ -226,6 +233,7 @@ namespace U3DXT.iOS.Personal {
 
 			eventStore.SaveEvent(newEvent, EKSpan.ThisEvent, null);
 			eventStore.SaveCalendar(calendar,true, null);
+			eventStore.Commit(null);
 		}
 
 		/// <summary>
