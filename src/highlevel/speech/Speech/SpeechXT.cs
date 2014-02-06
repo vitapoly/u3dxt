@@ -121,10 +121,11 @@ namespace U3DXT.iOS.Speech {
 		/// <summary>
 		/// Pause speech.
 		/// </summary>
-		public static bool Pause() {
+		/// <param name="boundary">Whether to pause immediately or at word.</param>
+		public static bool Pause(AVSpeechBoundary boundary = AVSpeechBoundary.Immediate) {
 			if (_syn == null)
 				return false;
-			return _syn.PauseSpeakingAtBoundary(AVSpeechBoundary.Word);
+			return _syn.PauseSpeakingAtBoundary(boundary);
 		}
 
 		/// <summary>
@@ -139,10 +140,11 @@ namespace U3DXT.iOS.Speech {
 		/// <summary>
 		/// Stop speech.
 		/// </summary>
-		public static bool Stop() {
+		/// <param name="boundary">Whether to stop immediately or at word.</param>
+		public static bool Stop(AVSpeechBoundary boundary = AVSpeechBoundary.Immediate) {
 			if (_syn == null)
 				return false;
-			return _syn.StopSpeakingAtBoundary(AVSpeechBoundary.Word);
+			return _syn.StopSpeakingAtBoundary(boundary);
 		}
 
 		/// <summary>
