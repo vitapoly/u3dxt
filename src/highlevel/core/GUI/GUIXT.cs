@@ -46,10 +46,13 @@ namespace U3DXT.iOS.GUI {
 
 			var rootVc = UIApplication.deviceRootViewController;
 			if (CoreXT.IsiPad && (source != UIImagePickerControllerSourceType.Camera)) {
-				if (_popover == null)
+				if (_popover == null) {
 					_popover = new UIPopoverController(_picker);
-				else
+					_popover.DidDismiss += _OnCancelledPick;
+					_popover.shouldDismissHandler = _ShouldDismissPopover;
+				} else {
 					_popover.contentViewController = _picker;
+				}
 
 				var rect = rootVc.view.bounds;
 				rect.x = rect.width / 2;
@@ -78,21 +81,32 @@ namespace U3DXT.iOS.GUI {
 			_popover = null;
 
 			var image = e.info[UIImagePickerController.OriginalImage] as UIImage;
+			NSURL url = null;
+			if (e.info.ContainsKey(UIImagePickerController.ReferenceURL))
+				url = e.info[UIImagePickerController.ReferenceURL] as NSURL;
 
 			if (_mediaPickedHandlers != null)
-				_mediaPickedHandlers(null, new MediaPickedEventArgs(image));
+				_mediaPickedHandlers(null, new MediaPickedEventArgs(image, url));
 		}
 
 		private static void _OnCancelledPick(object sender, EventArgs e) {
-			if (_picker.parentViewController != null)
+			if (_popover != null) {
+//				_popover.DismissPopover(true);
+			} else if (_picker.parentViewController != null) {
 				_picker.parentViewController.DismissViewController(true, null);
-			else
+			} else {
 				UIApplication.deviceRootViewController.DismissViewController(true, null);
+			}
+
 			_picker = null;
 			_popover = null;
 
 			if (_mediaPickCancelledHandlers != null)
 				_mediaPickCancelledHandlers(null, EventArgs.Empty);
+		}
+
+		private static bool _ShouldDismissPopover(UIPopoverController popover) {
+			return true;
 		}
 
 		/// <summary>

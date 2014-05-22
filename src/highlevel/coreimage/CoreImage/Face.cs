@@ -7,7 +7,7 @@ namespace U3DXT.iOS.CoreImage {
 
 	/// <summary>
 	/// A Face object contains info on the location and size of face features in an image.
-	/// This is returned by FaceDetector.DetectInImage() and used in FacesDetectedEventArgs.
+	/// This is returned by FaceDetector.DetectInImage().
 	/// </summary>
 	public class Face {
 
@@ -106,6 +106,61 @@ namespace U3DXT.iOS.CoreImage {
 		/// </summary>
 		/// <value><c>true</c> if the face has a tracking frame count; otherwise, <c>false</c>.</value>
 		public bool hasTrackingFrameCount {
+			get;
+			internal set;
+		}
+		
+		/// <summary>
+		/// The rotation of the face in radians. Available in iOS 7.0 and later.
+		/// </summary>
+		/// <value>
+		/// The face angle.
+		/// </value>
+		public float faceAngle {
+			get;
+			internal set;
+		}
+		
+		/// <summary>
+		/// Indicates whether this <see cref="U3DXT.iOS.CoreImage.Face"/> has face angle. Available in iOS 7.0 and later.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if has face angle; otherwise, <c>false</c>.
+		/// </value>
+		public bool hasFaceAngle {
+			get;
+			internal set;
+		}
+		
+		/// <summary>
+		/// Indicates whether this <see cref="U3DXT.iOS.CoreImage.Face"/> has a smile. Available in iOS 7.0 and later.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if has a smile; otherwise, <c>false</c>.
+		/// </value>
+		public bool hasSmile {
+			get;
+			internal set;
+		}
+		
+		/// <summary>
+		/// Indicates whether this <see cref="U3DXT.iOS.CoreImage.Face"/>'s left eye is closed. Available in iOS 7.0 and later.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if left eye is closed; otherwise, <c>false</c>.
+		/// </value>
+		public bool leftEyeClosed {
+			get;
+			internal set;
+		}
+		
+		/// <summary>
+		/// Indicates whether this <see cref="U3DXT.iOS.CoreImage.Face"/>'s right eye is closed. Available in iOS 7.0 and later.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if right eye is closed; otherwise, <c>false</c>.
+		/// </value>
+		public bool rightEyeClosed {
 			get;
 			internal set;
 		}
