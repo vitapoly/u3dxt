@@ -36,13 +36,16 @@ namespace U3DXT.iOS.GUI {
 		/// <summary>
 		/// Shows the image picker.
 		/// </summary>
-		public static void ShowImagePicker(UIImagePickerControllerSourceType source = UIImagePickerControllerSourceType.PhotoLibrary) {
+		public static void ShowImagePicker(UIImagePickerControllerSourceType source = UIImagePickerControllerSourceType.PhotoLibrary,
+		                                   UIImagePickerControllerCameraDevice cameraDevice = UIImagePickerControllerCameraDevice.Rear) {
 			_picker = new UIImagePickerController();
 //			_picker.AllowsEditing = true;
 			_picker.sourceType = source;
 //			_picker.Delegate = ImagePickerControllerDelegate.instance;
 			_picker.DidFinishPickingMediaWithInfo += _OnPickedMedia;
 			_picker.DidCancel += _OnCancelledPick;
+			if (source == UIImagePickerControllerSourceType.Camera)
+				_picker.cameraDevice = cameraDevice;
 
 			var rootVc = UIApplication.deviceRootViewController;
 			if (CoreXT.IsiPad && (source != UIImagePickerControllerSourceType.Camera)) {
