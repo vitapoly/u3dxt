@@ -104,6 +104,8 @@ namespace U3DXT.iOS.Social {
 					nativeItems[i] = item;
 				else if (item is NSURL)
 					nativeItems[i] = item;
+				else if (item is NSData)
+					nativeItems[i] = item;
 				else
 					throw new U3DXTException("Unexpected item type: " + item.GetType());
 			}
