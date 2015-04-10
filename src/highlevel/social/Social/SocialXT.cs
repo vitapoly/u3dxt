@@ -104,6 +104,8 @@ namespace U3DXT.iOS.Social {
 					nativeItems[i] = item;
 				else if (item is NSURL)
 					nativeItems[i] = item;
+				else if (item is NSData)
+					nativeItems[i] = item;
 				else
 					throw new U3DXTException("Unexpected item type: " + item.GetType());
 			}
@@ -118,10 +120,7 @@ namespace U3DXT.iOS.Social {
 			
 			var rootVc = UIApplication.deviceRootViewController;
 			if (CoreXT.IsiPad) {
-				if (_popover == null)
-					_popover = new UIPopoverController(vc);
-				else
-					_popover.contentViewController = vc;
+				_popover = new UIPopoverController(vc);
 				
 				var rect = rootVc.view.bounds;
 				rect.x = rect.width / 2;
